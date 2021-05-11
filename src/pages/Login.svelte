@@ -13,25 +13,23 @@
     let username;
     let password;
   
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
+      e.preventDefault();
+
       const from = ($location.state && $location.state.from) || "/";
 
-      supabase.auth.signIn({
+      let {res, error } = await supabase.auth.signIn({
         email: username,
         password: password
-      }).then((res, error) => {
-
-        if(res.error) {
-            console.log(res.error);
-        }
-        $user = res
-
-        console.log(userLogged);
       })
-
-    //   navigate(from, { replace: true });
-
-      e.preventDefault();
+      
+      if(error) {
+          console.log(error);
+          alert(error.message);
+      }else {
+        $user = res
+        navigate(from, { replace: true });
+      }
     }
 </script>
 
