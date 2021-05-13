@@ -5,6 +5,7 @@
 	import Login from "./pages/Login.svelte";
 	import PrivateLayout from "./layout/PrivateLayout.svelte";
     import { user } from "./store/user";
+	import Todo from "./pages/Todo.svelte";
 
 	function handleLogout() {
 		$user = null;
@@ -13,16 +14,13 @@
 
 <Router>
 	<main>
-		<h1>Hello {name}!</h1>
-		<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
-
-		<nav>
+		<!-- <nav>
 			<Link to="/">Home</Link>
 			<Link to="about">About</Link>
 			<Link to="profile">Profile</Link>
 			<Link to="login">Login</Link>
 			<Link to="todo">Todo</Link>
-		</nav>
+		</nav> -->
 
 		<main>
 			<Route path="login">
@@ -30,8 +28,7 @@
 			</Route>
 		
 			<Route path="/">
-				<h3>Home</h3>
-				<p>Home sweet home...</p>
+				<Todo />
 			</Route>
 		
 			<Route path="about">

@@ -210,6 +210,20 @@ builtin-modules@^3.1.0:
   resolved "https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.2.0.tgz"
   integrity sha512-lGzLKcioL90C7wMczpkY0n/oART3MbBa8R9OFGE1rJxoVI86u4WAGfEk8Wjv10eKSyTHVGkSo3bvBylCEtk7LA==
 
+carbon-components-svelte@^0.33.0:
+  version "0.33.0"
+  resolved "https://registry.yarnpkg.com/carbon-components-svelte/-/carbon-components-svelte-0.33.0.tgz#eb09cdfbb36daffb217f7c0dea92e36daa7c37f7"
+  integrity sha512-bVobGZsHc8/EqpzyJ8y/iL+SaLb1JkRsHSPaLiKfDtmF5m2Ft6d5iP5QfNmSCEiJNb7ZmvP54odsitZo0lWoGQ==
+  dependencies:
+    carbon-icons-svelte "^10.27.0"
+    clipboard-copy "3.2.0"
+    flatpickr "4.6.9"
+
+carbon-icons-svelte@^10.27.0:
+  version "10.28.0"
+  resolved "https://registry.yarnpkg.com/carbon-icons-svelte/-/carbon-icons-svelte-10.28.0.tgz#812a6eae858d0c9e043067c714910fcfb6249cd2"
+  integrity sha512-C3K+U2PRy63WHFZme1HQNju89rhVIQmUkfgBrZzcezdutkhXbSPOY+o/MI0B2mDcQ7G9gfhEpqsXET8gBTWfJQ==
+
 chalk@^2.0.0:
   version "2.4.2"
   resolved "https://registry.npmjs.org/chalk/-/chalk-2.4.2.tgz"
@@ -233,6 +247,11 @@ chokidar@^3.5.0:
     readdirp "~3.5.0"
   optionalDependencies:
     fsevents "~2.3.1"
+
+clipboard-copy@3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/clipboard-copy/-/clipboard-copy-3.2.0.tgz#3c5b8651d3512dcfad295d77a9eb09e7fac8d5fb"
+  integrity sha512-vooFaGFL6ulEP1liiaWFBmmfuPm3cY3y7T9eB83ZTnYc/oFeAKsq3NcDrOkBC8XaauEE8zHQwI7k0+JSYiVQSQ==
 
 color-convert@^1.9.0:
   version "1.9.3"
@@ -362,6 +381,11 @@ fill-range@^7.0.1:
   integrity sha512-qOo9F+dMUmC2Lcb4BbVvnKJxTPjCm+RRpe4gDuGrzkL7mEVl/djYSu2OdQ2Pa302N4oqkSg9ir6jaLWJ2USVpQ==
   dependencies:
     to-regex-range "^5.0.1"
+
+flatpickr@4.6.9:
+  version "4.6.9"
+  resolved "https://registry.yarnpkg.com/flatpickr/-/flatpickr-4.6.9.tgz#9a13383e8a6814bda5d232eae3fcdccb97dc1499"
+  integrity sha512-F0azNNi8foVWKSF+8X+ZJzz8r9sE1G4hl06RyceIaLvyltKvDl6vqk9Lm/6AUUCi5HWaIjiUbk7UpeE/fOXOpw==
 
 fs.realpath@^1.0.0:
   version "1.0.0"
