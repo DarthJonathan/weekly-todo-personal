@@ -574,6 +574,11 @@ minimatch@^3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
+moment@^2.29.1:
+  version "2.29.1"
+  resolved "https://registry.npmjs.org/moment/-/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
+  integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
+
 mri@^1.1.0:
   version "1.1.6"
   resolved "https://registry.npmjs.org/mri/-/mri-1.1.6.tgz"
@@ -803,6 +808,11 @@ supports-color@^7.0.0:
   integrity sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==
   dependencies:
     has-flag "^4.0.0"
+
+svelte-dnd-action@^0.9.8:
+  version "0.9.8"
+  resolved "https://registry.npmjs.org/svelte-dnd-action/-/svelte-dnd-action-0.9.8.tgz#d8e6813aba64148b38ac65ec5df7b153568b5cfa"
+  integrity sha512-EWzxSpgNRkD6t8oHWcY4hqMoDJ16nkeFTza3V5K1r8GDqCJwK32zhpNv9ETDwfQiy2V2bJJMrH7io9xdlkYadg==
 
 svelte-navigator@^3.1.5:
   version "3.1.5"
