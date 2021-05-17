@@ -1,6 +1,4 @@
 <script>
-	export let name;
-	
 	import { Router, Route, Link } from "svelte-navigator";
 	import Login from "./pages/Login.svelte";
 	import PrivateLayout from "./layout/PrivateLayout.svelte";

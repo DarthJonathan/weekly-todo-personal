@@ -104,6 +104,20 @@
     function handleFrontDate() {
         modifier += 1 
     }
+
+    function handleNew(row, node) {
+        let key = moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')
+        if (node.target.classList.contains('column-content')) {
+            //Add new clickable tile 
+            if (todo[key] === undefined) {
+                todo[key] = []
+            }
+            todo[key] = todo[key].concat([{
+                id: 'placeholder-id', name: "", done: false
+            }])
+        }
+    }
+
     </script>
 
 <Grid style="padding-top:1em; min-height: 100vh;">
@@ -127,7 +141,7 @@
                         {moment().add(row, 'd').add(modifier, 'd').format('dddd')}
                     </h3>
                 </div>
-                <div class="column-content" use:dndzone="{{items: todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] ? todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] : [], flipDurationMs, dropTargetStyle: {outline: 'rgba(125, 125, 125, 0.3) solid 1.5px'}}}" on:consider="{(e) => handleDndConsiderCards(row,e)}" on:finalize="{(e) => handleDndFinalizeCards(row,e)}">
+                <div class="column-content" on:click={(e) => handleNew(row, e)} use:dndzone="{{items: todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] ? todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] : [], flipDurationMs, dropTargetStyle: {outline: 'rgba(125, 125, 125, 0.3) solid 1.5px'}}}" on:consider="{(e) => handleDndConsiderCards(row,e)}" on:finalize="{(e) => handleDndFinalizeCards(row,e)}">
                     {#each todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] ? todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] : [] as item(item.id)}
                         <div class="card" animate:flip="{{duration: flipDurationMs}}" on:keypress={(e) => onKeyPress(row, item, e)}>
                             {#if item.done}
@@ -165,5 +179,8 @@
     }
     .button-tile {
         display: flex;
+    }
+    .card {
+        margin-bottom: 1em;
     }
 </style>
