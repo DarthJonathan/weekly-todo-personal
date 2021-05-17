@@ -47,7 +47,7 @@
 <style>
 	main {
 		min-height: 100vh;
-		text-align: center;
+		text-align: left;
 		padding: 0;
 		max-width: 240px;
 		margin: 0 auto;
