@@ -5,8 +5,6 @@
     const navigate = useNavigate();
     const location = useLocation();
 
-    console.log($userStore)
-
     $: if (!$userStore.id) {
         navigate("/login", {
         state: { from: $location.pathname },

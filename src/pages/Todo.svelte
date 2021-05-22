@@ -8,6 +8,7 @@
     import { userStore } from "../store/user";
 
     let todo = {}
+    let finalConsideration = 0
 
     onMount(async () => {
         let { data: todoList, error } = await supabase
@@ -35,14 +36,36 @@
     function handleDndConsiderCards(date, e) {
         let key = moment().add(date, 'd').add(modifier, 'd').format('yyyyMMDD')
         todo[key] = e.detail.items;
+        finalConsideration = date;
     }
 
-    function handleDndFinalizeCards(date, e) {
+    async function handleDndFinalizeCards(date, e) {
         let key = moment().add(date, 'd').add(modifier, 'd').format('yyyyMMDD')
+        let oldItems = todo[key]
         todo[key] = e.detail.items;
+
+        for(let i = 0; i < todo[key].length; i++) {
+            let idx = oldItems.findIndex(c => c.id === todo[key][i].id);
+
+            if (idx === undefined || idx === 0) {
+                //Updates the date for id
+                let item = todo[key][i]
+                let considerDate = moment().add(finalConsideration, 'd').add(modifier, 'd').format('yyyyMMDD')
+
+                const { data, error } = await supabase
+                            .from('todo')
+                            .update({ date: considerDate })
+                            .eq('id', item.id)
+
+                if (error !== null) {
+                    alert('unable to update!');
+                    console.log(error)
+                }
+            }
+        }
     }
 
-    function handleClick(date, item) {
+    async function handleClick(date, item) {
         let key = moment().add(date, 'd').add(modifier, 'd').format('yyyyMMDD')
         let todoId = document.getElementById(key + item.id);
 
@@ -52,9 +75,18 @@
 
         const idx = todo[key].findIndex(c => c.id === item.id);
         todo[key][idx].done = !todo[key][idx].done;
+
+        const { data, error } = await supabase
+                    .from('todo')
+                    .update({ done: todo[key][idx].done })
+                    .eq('id', item.id)
+
+        if (error !== null) {
+            alert('unable to update done!');
+        }
     }
 
-    function handleEdit(date, item, e) {
+    async function handleEdit(date, item, e) {
         let key = moment().add(date, 'd').add(modifier, 'd').format('yyyyMMDD')
         let todoId = document.getElementById(key + item.id);
 
@@ -63,25 +95,55 @@
             todo[key][idx].action = todoId.textContent;
 
             todoId.setAttribute('contenteditable', 'false');
+
+            const { data, error } = await supabase
+                        .from('todo')
+                        .update({ action: todo[key][idx].action })
+                        .eq('id', item.id)
+
+            if (error !== null) {
+                alert('unable to update!');
+                console.log(error)
+            }
         }else {
             todoId.setAttribute('contenteditable', 'true');
         }
     }
 
-    function onKeyPress(date, item, e) {
+    async function onKeyPress(date, item, e) {
         if (e.charCode == 13) {
             let key = moment().add(date, 'd').add(modifier, 'd').format('yyyyMMDD')
             let todoId = document.getElementById(key + item.id);
             const idx = todo[key].findIndex(c => c.id === item.id);
             todo[key][idx].action = todoId.textContent;
             todoId.setAttribute('contenteditable', 'false');
+
+            const { data, error } = await supabase
+                        .from('todo')
+                        .update({ action: todo[key][idx].action })
+                        .eq('id', item.id)
+
+            if (error !== null) {
+                alert('unable to update!');
+                console.log(error)
+            }
         }
     }
 
-    function handleDelete(date, item, e) {
+    async function handleDelete(date, item, e) {
         let key = moment().add(date, 'd').add(modifier, 'd').format('yyyyMMDD')
         const result = todo[key].filter(c => c.id !== item.id);
         todo[key] = result;
+
+        const { data, error } = await supabase
+                    .from('todo')
+                    .delete()
+                    .eq('id', item.id)
+
+        if (error !== null) {
+            alert('unable to delete!');
+            console.log(error)
+        }
     }
 
     function handleBackDate() {
@@ -114,8 +176,6 @@
                     todo[key][i].id = data[0].id
                 }
             }
-
-            console.log(data);
         }
     }
     </script>
@@ -160,6 +220,7 @@
                                 <Button style="width: 50%;" on:click={(e) => handleEdit(row, item, e)}>E</Button>
                                 <Button style="width: 50%;" on:click={(e) => handleDelete(row, item, e)}>D</Button>
                             </div>
+                            <hr style="border-bottom: solid 1px #000"/>
                         </div>
                     {/each}
                 </div>
