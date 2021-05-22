@@ -3,44 +3,31 @@
     import {dndzone} from "svelte-dnd-action";
     import {flip} from "svelte/animate";
     import moment from 'moment';
+    import { onMount } from 'svelte';
+    import supabase from '../util/supabase-util';
+    import { userStore } from "../store/user";
 
-    let todo = {
-        "20210517": [
-            {id: 41, name: "item41", done: true},
-            {id: 42, name: "item42", done: false},
-            {id: 43, name: "item43", done: false},
-            {id: 50, name: "item41", done: false},
-            {id: 51, name: "item42", done: false},
-            {id: 52, name: "item43", done: false},
-            {id: 53, name: "item41", done: false},
-            {id: 54, name: "item42", done: false},
-            {id: 55, name: "item43", done: false},
-            {id: 56, name: "item41", done: false},
-            {id: 57, name: "item42", done: false},
-            {id: 58, name: "item43", done: false},
-            {id: 59, name: "item41", done: false},
-            {id: 60, name: "item42", done: false},
-            {id: 61, name: "item43", done: false},
-            {id: 62, name: "item41", done: false},
-            {id: 63, name: "item42", done: false},
-            {id: 64, name: "item43", done: false},
-            {id: 65, name: "item41", done: false},
-            {id: 66, name: "item42", done: false},
-            {id: 67, name: "item43", done: false},
-            {id: 68, name: "item41", done: false},
-            {id: 69, name: "item42", done: false},
-            {id: 70, name: "item43", done: false},
-            {id: 71, name: "item41", done: false},
-            {id: 72, name: "item42", done: false},
-            {id: 73, name: "item43", done: false},
-        ],
-        "20210518": [
-            {id: 44, name: "item44", done: false},
-        ],
-        "20210519": [
-            {id: 43, name: "item43", done: false},
-        ],
-    }
+    let todo = {}
+
+    onMount(async () => {
+        let { data: todoList, error } = await supabase
+            .from('todo')
+            .select('*')
+            .gt('date', moment().add(-30, 'd').format('yyyyMMDD'))
+            .eq('user_id', $userStore.id)
+
+        if (error == undefined) {
+            for(let i = 0; i < todoList.length; i++) {
+                let date = moment(todoList[i].date).format('yyyyMMDD')
+                
+                if (todo[date] == undefined) {
+                    todo[date] = []
+                }
+
+                todo[date] = todo[date].concat([todoList[i]])
+            }
+        }
+    })
 
     let modifier = 0
     const flipDurationMs = 200;
@@ -73,7 +60,7 @@
 
         if(todoId.getAttribute('contenteditable') == 'true') {
             const idx = todo[key].findIndex(c => c.id === item.id);
-            todo[key][idx].name = todoId.textContent;
+            todo[key][idx].action = todoId.textContent;
 
             todoId.setAttribute('contenteditable', 'false');
         }else {
@@ -86,7 +73,7 @@
             let key = moment().add(date, 'd').add(modifier, 'd').format('yyyyMMDD')
             let todoId = document.getElementById(key + item.id);
             const idx = todo[key].findIndex(c => c.id === item.id);
-            todo[key][idx].name = todoId.textContent;
+            todo[key][idx].action = todoId.textContent;
             todoId.setAttribute('contenteditable', 'false');
         }
     }
@@ -105,7 +92,7 @@
         modifier += 1 
     }
 
-    function handleNew(row, node) {
+    async function handleNew(row, node) {
         let key = moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')
         if (node.target.classList.contains('column-content')) {
             //Add new clickable tile 
@@ -113,11 +100,24 @@
                 todo[key] = []
             }
             todo[key] = todo[key].concat([{
-                id: 'placeholder-id', name: "", done: false
+                id: 'placeholder-id', action: "", done: false
             }])
+
+            const { data, error } = await supabase
+            .from('todo')
+            .insert([
+                { action: '', user_id: $userStore.id, date: moment().add(row, 'd').add(modifier, 'd') },
+            ])
+
+            for(let i = 0; i < todo[key].length; i++) {
+                if (todo[key][i].id === 'placeholder-id') {
+                    todo[key][i].id = data[0].id
+                }
+            }
+
+            console.log(data);
         }
     }
-
     </script>
 
 <Grid style="padding-top:1em; min-height: 100vh;">
@@ -149,12 +149,12 @@
                                     id={moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')+item.id} 
                                     disabled 
                                     on:click={handleClick(row, item)}
-                                >{item.name}</ClickableTile>
+                                >{item.action}</ClickableTile>
                             {:else}
                                 <ClickableTile 
                                     id={moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')+item.id} 
                                     on:click={handleClick(row, item)}
-                                >{item.name}</ClickableTile>
+                                >{item.action}</ClickableTile>
                             {/if}
                             <div class="button-tile">
                                 <Button style="width: 50%;" on:click={(e) => handleEdit(row, item, e)}>E</Button>

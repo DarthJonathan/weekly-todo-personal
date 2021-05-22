@@ -1,11 +1,7 @@
 <script>
     import { useNavigate, useLocation } from "svelte-navigator";
-    import { user } from "../store/user";
-    import { createClient } from '@supabase/supabase-js'
-
-    const supabaseUrl = 'https://iupdirgjypmgamuxcneh.supabase.co'
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYyMDU3NTk3NywiZXhwIjoxOTM2MTUxOTc3fQ.GJvfqCz723_XySApQrVFoQxie-1kh9S6gQGnuKqtYRA'
-    const supabase = createClient(supabaseUrl, SUPABASE_KEY)
+    import { userStore } from "../store/user";
+    import supabase from '../util/supabase-util';
   
     const navigate = useNavigate();
     const location = useLocation();
@@ -18,16 +14,38 @@
 
       const from = ($location.state && $location.state.from) || "/";
 
-      let {res, error } = await supabase.auth.signIn({
+      let {user, error } = await supabase.auth.signIn({
         email: username,
         password: password
       })
       
+      console.log(user);
+
       if(error) {
           console.log(error);
           alert(error.message);
       }else {
-        $user = res
+        $userStore = user
+        navigate(from, { replace: true });
+      }
+    }
+
+    async function handleGithub(e) {
+      e.preventDefault();
+
+      const from = ($location.state && $location.state.from) || "/";
+
+      let {user, error} = await supabase.auth.signIn({
+        provider: 'github'
+      })
+      
+      console.log(user)
+
+      if(error) {
+          console.log(error);
+          alert(error.message);
+      }else {
+        $userStore = user
         navigate(from, { replace: true });
       }
     }
@@ -37,7 +55,7 @@
 <form>
   <input
     bind:value={username}
-    type="text"
+    type="email"
     name="username"
     placeholder="Username"
   />
@@ -49,5 +67,6 @@
     placeholder="Password"
   />
   <br />
+  <button on:click={handleGithub}>Github Sign In</button>
   <button type="submit" on:click={handleSubmit}>Login</button>
 </form>

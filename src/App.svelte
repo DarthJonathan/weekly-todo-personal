@@ -1,12 +1,13 @@
 <script>
 	import { Router, Route, Link } from "svelte-navigator";
 	import Login from "./pages/Login.svelte";
+	import Register from "./pages/Register.svelte";
 	import PrivateLayout from "./layout/PrivateLayout.svelte";
-    import { user } from "./store/user";
+    import { userStore } from "./store/user";
 	import Todo from "./pages/Todo.svelte";
 
 	function handleLogout() {
-		$user = null;
+		$userStore = null;
   	}
 </script>
 
@@ -24,18 +25,17 @@
 			<Route path="login">
 				<Login />
 			</Route>
+
+			<Route path="register">
+				<Register />
+			</Route>
 		
-			<Route path="/">
+			<PrivateLayout path="/" let:location>
 				<Todo />
-			</Route>
-		
-			<Route path="about">
-				<h3>About</h3>
-				<p>That's what it's all about!</p>
-			</Route>
+			</PrivateLayout>
 		
 			<PrivateLayout path="todo" let:location>
-				<h3>Welcome {$user.username}</h3>
+				<h3>Welcome {$userStore.username}</h3>
 				<button on:click={handleLogout}>Logout</button>
 			</PrivateLayout>
 		</main>
