@@ -5,6 +5,8 @@ import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
 import json from "@rollup/plugin-json";
+import {config} from 'dotenv';
+import replace from '@rollup/plugin-replace';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -59,6 +61,16 @@ export default {
 		}),
 		commonjs(),
         json(), 
+
+		replace({
+			// stringify the object       
+			env_vars: JSON.stringify({
+			  env: {
+				isProd: production,
+				...config().parsed // attached the .env config
+			  }
+			}),
+		  }),
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated
