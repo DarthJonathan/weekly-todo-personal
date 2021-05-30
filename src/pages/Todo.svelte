@@ -6,6 +6,10 @@
     import { onMount } from 'svelte';
     import supabase from '../util/supabase-util';
     import { userStore } from "../store/user";
+    import ChevronRight32 from "carbon-icons-svelte/lib/ChevronRight32";
+    import ChevronLeft32 from "carbon-icons-svelte/lib/ChevronLeft32";
+    import Edit20 from "carbon-icons-svelte/lib/Edit20";
+    import Delete20 from "carbon-icons-svelte/lib/Delete20";
 
     let todo = {}
     let finalConsideration = 0
@@ -180,45 +184,51 @@
     }
     </script>
 
-<Grid style="padding-top:1em; min-height: 100vh;">
+<Grid padding={true} style="padding-top:1em; min-height: 90vh;">
     <Row>
         <Column style="text-align:left;">
-            <Button on:click={handleBackDate}>Back</Button>
+            <ChevronLeft32 style="fill: blue" on:click={handleBackDate} />
         </Column>
-        <Column style="text-align:center;">
-            <h2>DOThese</h2>
+        <Column style="text-align:center; outline: none;">
+            <h2>TO:DO</h2>
         </Column>
         <Column style="text-align:right;">
-            <Button on:click={handleFrontDate}>Forward</Button>
+            <ChevronRight32 style="fill: blue" on:click={handleFrontDate} />
         </Column>
     </Row>
     <br />
     <Row style="height: 90vh;">
         {#each Array(5) as _, row}
             <Column style="overflow-y: hidden; height: 90vh; padding-bottom: 1em;">
-                <div class="mb-3">
+                <div class="mb-3" style="text-align:center">
                     <h3>
                         {moment().add(row, 'd').add(modifier, 'd').format('dddd')}
                     </h3>
                 </div>
                 <div class="column-content" on:click={(e) => handleNew(row, e)} use:dndzone="{{items: todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] ? todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] : [], flipDurationMs, dropTargetStyle: {outline: 'rgba(125, 125, 125, 0.3) solid 1.5px'}}}" on:consider="{(e) => handleDndConsiderCards(row,e)}" on:finalize="{(e) => handleDndFinalizeCards(row,e)}">
                     {#each todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] ? todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] : [] as item(item.id)}
-                        <div class="card" animate:flip="{{duration: flipDurationMs}}" on:keypress={(e) => onKeyPress(row, item, e)}>
+                        <div style="padding-top:1em;" class="card" animate:flip="{{duration: flipDurationMs}}" on:keypress={(e) => onKeyPress(row, item, e)}>
                             {#if item.done}
                                 <ClickableTile 
                                     id={moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')+item.id} 
                                     disabled 
                                     on:click={handleClick(row, item)}
+                                    style="min-height: 100px;"
                                 >{item.action}</ClickableTile>
                             {:else}
                                 <ClickableTile 
                                     id={moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')+item.id} 
                                     on:click={handleClick(row, item)}
+                                    style="min-height: 100px;"
                                 >{item.action}</ClickableTile>
                             {/if}
                             <div class="button-tile">
-                                <Button style="width: 50%;" on:click={(e) => handleEdit(row, item, e)}>E</Button>
-                                <Button style="width: 50%;" on:click={(e) => handleDelete(row, item, e)}>D</Button>
+                                <Button style="width: 50%;" on:click={(e) => handleEdit(row, item, e)}>
+                                    <Edit20 />
+                                </Button>
+                                <Button style="width: 50%;" on:click={(e) => handleDelete(row, item, e)}>
+                                    <Delete20 />
+                                </Button>
                             </div>
                             <hr style="border-bottom: solid 1px #000"/>
                         </div>

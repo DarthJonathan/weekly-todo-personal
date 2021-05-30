@@ -14,7 +14,7 @@
 <Router>
 	<main>
 		<!-- <nav>
-			<Link to="/">Home</Link>
+			<Link to="/">TODO</Link>
 			<Link to="about">About</Link>
 			<Link to="profile">Profile</Link>
 			<Link to="login">Login</Link>
@@ -34,8 +34,7 @@
 				<Todo />
 			</PrivateLayout>
 		
-			<PrivateLayout path="todo" let:location>
-				<h3>Welcome {$userStore.username}</h3>
+			<PrivateLayout path="/logout" let:location>
 				<button on:click={handleLogout}>Logout</button>
 			</PrivateLayout>
 		</main>
