@@ -5,7 +5,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public --no-clear --single",
+    "start": "sirv public --no-clear --single --port 5555",
     "start:dev": "sirv public --dev --single"
   },
   "devDependencies": {
@@ -28,6 +28,7 @@
     "carbon-components-svelte": "^0.33.0",
     "moment": "^2.29.1",
     "sirv-cli": "^1.0.0",
-    "svelte-navigator": "^3.1.5"
+    "svelte-navigator": "^3.1.5",
+    "yup": "^0.32.11"
   }
 }

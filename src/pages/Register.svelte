@@ -1,6 +1,5 @@
 <script>
     import { useNavigate, useLocation } from "svelte-navigator";
-    import { userStore } from "../store/user";
     import supabase from '../util/supabase-util';
   
     const navigate = useNavigate();
@@ -25,7 +24,6 @@
           console.log(error);
           alert(error.message);
       }else {
-        $userStore = user
         navigate(from, { replace: true });
       }
     }

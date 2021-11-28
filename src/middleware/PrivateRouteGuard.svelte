@@ -1,11 +1,12 @@
 <script>
     import { useNavigate, useLocation } from "svelte-navigator";
-    import { userStore } from "../store/user";
+    import supabase from '../util/supabase-util';
 
     const navigate = useNavigate();
     const location = useLocation();
-    
-    $: if (!$userStore.id) {
+    const user = supabase.auth.user();
+
+    $: if (!user || !user.id) {
         navigate("/login", {
         state: { from: $location.pathname },
         replace: true,
@@ -13,6 +14,6 @@
     }
 </script>
 
-{#if $userStore.id}
+{#if user && user.id}
     <slot />
 {/if}

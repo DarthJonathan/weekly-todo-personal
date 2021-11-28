@@ -1,11 +1,27 @@
 <script>
-    import { Grid, Row, Column, ClickableTile, Button } from "carbon-components-svelte";
+    import { 
+        Grid, 
+        Row, 
+        Column, 
+        ClickableTile, 
+        Content,
+        Button,
+        Header,
+        HeaderNav,
+        HeaderNavItem,
+        HeaderNavMenu,
+        SideNav,
+        SideNavItems,
+        SideNavMenu,
+        SideNavMenuItem,
+        SideNavLink,
+        SkipToContent
+    } from "carbon-components-svelte";
     import {dndzone} from "svelte-dnd-action";
     import {flip} from "svelte/animate";
     import moment from 'moment';
     import { onMount } from 'svelte';
     import supabase from '../util/supabase-util';
-    import { userStore } from "../store/user";
     import ChevronRight32 from "carbon-icons-svelte/lib/ChevronRight32";
     import ChevronLeft32 from "carbon-icons-svelte/lib/ChevronLeft32";
     import Edit20 from "carbon-icons-svelte/lib/Edit20";
@@ -13,13 +29,15 @@
 
     let todo = {}
     let finalConsideration = 0
+    let user = supabase.auth.user()
+    let isSideNavOpen = false;
 
     onMount(async () => {
         let { data: todoList, error } = await supabase
             .from('todo')
             .select('*')
             .gt('date', moment().add(-30, 'd').format('yyyyMMDD'))
-            .eq('user_id', $userStore.id)
+            .eq('user_id', user.id)
 
         if (error == undefined) {
             for(let i = 0; i < todoList.length; i++) {
@@ -172,7 +190,7 @@
             const { data, error } = await supabase
             .from('todo')
             .insert([
-                { action: '', user_id: $userStore.id, date: moment().add(row, 'd').add(modifier, 'd') },
+                { action: '', user_id: user.id, date: moment().add(row, 'd').add(modifier, 'd') },
             ])
 
             for(let i = 0; i < todo[key].length; i++) {
@@ -182,62 +200,84 @@
             }
         }
     }
-    </script>
 
-<Grid padding={true} style="padding-top:1em; min-height: 90vh;">
-    <Row>
-        <Column style="text-align:left;">
-            <ChevronLeft32 style="fill: blue" on:click={handleBackDate} />
-        </Column>
-        <Column style="text-align:center; outline: none;">
-            <h2>TO:DO</h2>
-        </Column>
-        <Column style="text-align:right;">
-            <ChevronRight32 style="fill: blue" on:click={handleFrontDate} />
-        </Column>
-    </Row>
-    <br />
-    <Row style="height: 90vh;">
-        {#each Array(5) as _, row}
-            <Column style="overflow-y: hidden; height: 90vh; padding-bottom: 1em;">
-                <div class="mb-3" style="text-align:center">
-                    <h3>
-                        {moment().add(row, 'd').add(modifier, 'd').format('dddd')}
-                    </h3>
-                </div>
-                <div class="column-content" on:click={(e) => handleNew(row, e)} use:dndzone="{{items: todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] ? todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] : [], flipDurationMs, dropTargetStyle: {outline: 'rgba(125, 125, 125, 0.3) solid 1.5px'}}}" on:consider="{(e) => handleDndConsiderCards(row,e)}" on:finalize="{(e) => handleDndFinalizeCards(row,e)}">
-                    {#each todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] ? todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] : [] as item(item.id)}
-                        <div style="padding-top:1em;" class="card" animate:flip="{{duration: flipDurationMs}}" on:keypress={(e) => onKeyPress(row, item, e)}>
-                            {#if item.done}
-                                <ClickableTile 
-                                    id={moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')+item.id} 
-                                    disabled 
-                                    on:click={handleClick(row, item)}
-                                    style="min-height: 100px;"
-                                >{item.action}</ClickableTile>
-                            {:else}
-                                <ClickableTile 
-                                    id={moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')+item.id} 
-                                    on:click={handleClick(row, item)}
-                                    style="min-height: 100px;"
-                                >{item.action}</ClickableTile>
-                            {/if}
-                            <div class="button-tile">
-                                <Button style="width: 50%;" on:click={(e) => handleEdit(row, item, e)}>
-                                    <Edit20 />
-                                </Button>
-                                <Button style="width: 50%;" on:click={(e) => handleDelete(row, item, e)}>
-                                    <Delete20 />
-                                </Button>
-                            </div>
-                            <hr style="border-bottom: solid 1px #000"/>
-                        </div>
-                    {/each}
-                </div>
+    function handleLogout() {
+        supabase.auth.signOut().then(() => {
+            window.location.href = "/login";
+        });
+    }
+</script>
+
+<Header
+    company="TO:DO"
+    platformName={user.email}
+    bind:isSideNavOpen
+>
+    <HeaderNav>
+        <HeaderNavItem text="Logout" on:click={handleLogout} />
+    </HeaderNav>
+</Header>
+
+<Content style="height: 100%">
+    <Grid padding={true} style="padding-top:1em; height: 100%;">
+        <Row>
+            <Column style="text-align:left;">
+                <ChevronLeft32 style="fill: blue" on:click={handleBackDate} />
             </Column>
-        {/each}
-    </Row>
-</Grid>
+            <Column style="text-align:center; outline: none;">
+                <h2>TO:DO</h2>
+            </Column>
+            <Column style="text-align:right;">
+                <ChevronRight32 style="fill: blue" on:click={handleFrontDate} />
+            </Column>
+        </Row>
+        <br />
+        <Row style="height: 100%;">
+            {#each Array(5) as _, row}
+                <Column classname="day" style="overflow-y: hidden; height: 100%; padding-bottom: 1em;">
+                    <div class="mb-3" style="text-align:center">
+                        <h3>
+                            {moment().add(row, 'd').add(modifier, 'd').format('dddd')}
+                        </h3>
+                    </div>
+                    <div class="column-content" on:click={(e) => handleNew(row, e)} use:dndzone="{{items: todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] ? todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] : [], flipDurationMs, dropTargetStyle: {outline: 'rgba(125, 125, 125, 0.3) solid 1.5px'}}}" on:consider="{(e) => handleDndConsiderCards(row,e)}" on:finalize="{(e) => handleDndFinalizeCards(row,e)}">
+                        {#each todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] ? todo[moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')] : [] as item(item.id)}
+                            <div style="padding-top:1em;" class="card" animate:flip="{{duration: flipDurationMs}}" on:keypress={(e) => onKeyPress(row, item, e)}>
+                                {#if item.done}
+                                    <ClickableTile 
+                                        id={moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')+item.id} 
+                                        disabled 
+                                        on:click={handleClick(row, item)}
+                                        style="min-height: 100px;"
+                                    >
+                                        <strike>
+                                            {item.action}
+                                        </strike>
+                                    </ClickableTile>
+                                {:else}
+                                    <ClickableTile 
+                                        id={moment().add(row, 'd').add(modifier, 'd').format('yyyyMMDD')+item.id} 
+                                        on:click={handleClick(row, item)}
+                                        style="min-height: 100px;"
+                                    >{item.action}</ClickableTile>
+                                {/if}
+                                <div class="button-tile">
+                                    <Button style="width: 50%;" on:click={(e) => handleEdit(row, item, e)}>
+                                        <Edit20 />
+                                    </Button>
+                                    <Button style="width: 50%;" on:click={(e) => handleDelete(row, item, e)}>
+                                        <Delete20 />
+                                    </Button>
+                                </div>
+                                <hr style="border-bottom: solid 1px #000"/>
+                            </div>
+                        {/each}
+                    </div>
+                </Column>
+            {/each}
+        </Row>
+    </Grid>
+</Content>
 
 <style>
 	.mb-3 {
@@ -253,5 +293,8 @@
     }
     .card {
         margin-bottom: 1em;
+    }
+    .day::-webkit-scrollbar {
+       display: none;
     }
 </style>

@@ -1,159 +1,161 @@
 <script>
     import { useNavigate, useLocation } from "svelte-navigator";
-    import { userStore } from "../store/user";
     import supabase from '../util/supabase-util';
+    import { 
+      FluidForm,
+      FormGroup,
+      TextInput,
+      PasswordInput,
+      InlineNotification,
+      Content,
+      Button,
+      Row,
+      Column,
+      ButtonSet
+    } from 'carbon-components-svelte';
+    import ArrowRight32 from "carbon-icons-svelte/lib/ArrowRight32";
+    import { expoIn } from "svelte/easing";
+    import * as yup from 'yup';
   
     const navigate = useNavigate();
     const location = useLocation();
   
     let username;
     let password;
+    let errors = {};
+    let errorMessage = "";
+    let isValid;
+
+    let schema = yup.object().shape({
+        password: yup.string().required().max(30),
+        username: yup.string().required().email(),
+    });
+    
+    const extractErrors = err => {
+        return err.inner.reduce((acc, err) => {
+            return { ...acc, [err.path]: err.message };
+        }, {});
+    };
+  
+    async function handleGithub(e) {
+        e.preventDefault();
+
+        const from = ($location.state && $location.state.from) || "/";
+
+        let {user, error} = await supabase.auth.signIn({
+            provider: "github"
+        }, {
+            redirectTo: env_vars.env.BASE_URL + "/redirect"
+        })
+
+        if(error) {
+            console.log(error);
+            errorMessage = error.message;
+        }else {
+            navigate(from, { replace: true });
+        }
+    }
   
     async function handleSubmit(e) {
-      e.preventDefault();
+        e.preventDefault();
 
-      const from = ($location.state && $location.state.from) || "/";
+        isValid = schema.isValidSync({username: username, password: password});
 
-      let {user, error } = await supabase.auth.signIn({
-        email: username,
-        password: password
-      })
-      
-      console.log(user);
+        schema
+            .validate({username: username, password: password}, { abortEarly: false })
+            .then(() => {
+                errors = {}
+            })
+            .catch(err => {
+                errors = extractErrors(err);
+            })
 
-      if(error) {
-          console.log(error);
-          alert(error.message);
-      }else {
-        $userStore = user
-        navigate(from, { replace: true });
-      }
-    }
+        if (!isValid) {
+            return
+        }
 
-    async function handleGithub(e) {
-      e.preventDefault();
+        const from = ($location.state && $location.state.from) || "/";
 
-      const from = ($location.state && $location.state.from) || "/";
+        let {user, error} = await supabase.auth.signIn({
+            email: username,
+            password: password
+        }, {
+            redirectTo: env_vars.env.BASE_URL + "/redirect"
+        })
+        
+        console.log(error);
 
-      let {user, error} = await supabase.auth.signIn({
-        provider: 'github'
-      })
-      
-      console.log(user)
-
-      if(error) {
-          console.log(error);
-          alert(error.message);
-      }else {
-        $userStore = user
-        navigate(from, { replace: true });
-      }
+        if(error) {
+            console.log(error);
+            errorMessage = error.message;
+        }else {
+            navigate(from, { replace: true });
+        }
     }
 </script>
 
-<h1>Login</h1>
-<form>
-  <div class="row">
-    <label for="email">Email</label>
-    <input bind:value={username} type="email" name="email" autocomplete="off" placeholder="email@example.com">
-  </div>
-  <div class="row">
-    <label for="password">Password</label>
-    <input bind:value={password} type="password" name="password">
-  </div>
-  <button on:click={handleGithub}>Github Sign In</button>
-  <button on:click={handleSubmit} type="submit">Login</button>
-</form>
+<div style="position: relative; top: 50vh; transform: translateY(-50%);">
+    <Content style="display: block">
+        <Row>
+            <Column
+                xs={12}
+                sm={12}
+                md={6}
+                lg={5}
+            > 
+                <h1>
+                    Login
+                </h1>
+                
+                <br/>
+                <br/>
 
-<style>
-  @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+                <FluidForm>
+                    {#if errorMessage !== ''}
+                        <div in:expoIn>
+                            <InlineNotification
+                                title="Error:"
+                                subtitle={errorMessage}
+                            />
+                        </div>
+                        <br/>
+                    {/if}
 
-  body {
-    font-family: 'Open Sans', sans-serif;
-    background: #f9faff;
-    color: #3a3c47;
-    line-height: 1.6;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 0;
-    padding: 0;
-  }
-
-  h1 {
-    margin-top: 48px;
-  }
-
-  form {
-    background: #fff;
-    max-width: 360px;
-    width: 100%;
-    padding: 58px 44px;
-    border: 1px solid #e1e2f0;
-    border-radius: 4px;
-    box-shadow: 0 0 5px 0 rgba(42, 45, 48, 0.12);
-    transition: all 0.3s ease;
-  }
-
-  .row {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-  }
-
-  .row label {
-    font-size: 13px;
-    color: #8086a9;
-  }
-
-  .row input {
-    flex: 1;
-    padding: 13px;
-    border: 1px solid #d6d8e6;
-    border-radius: 4px;
-    font-size: 16px;
-    transition: all 0.2s ease-out;
-  }
-
-  .row input:focus {
-    outline: none;
-    box-shadow: inset 2px 2px 5px 0 rgba(42, 45, 48, 0.12);
-  }
-
-  .row input::placeholder {
-    color: #C8CDDF;
-  }
-
-  button {
-    width: 100%;
-    padding: 12px;
-    font-size: 18px;
-    background: #15C39A;
-    color: #fff;
-    border: none;
-    border-radius: 100px;
-    cursor: pointer;
-    font-family: 'Open Sans', sans-serif;
-    margin-top: 15px;
-    transition: background 0.2s ease-out;
-  }
-
-  button:hover {
-    background: #55D3AC;
-  }
-
-  @media(max-width: 458px) {
-    
-    body {
-      margin: 0 18px;
-    }
-    
-    form {
-      background: #f9faff;
-      border: none;
-      box-shadow: none;
-      padding: 20px 0;
-    }
-
-  }
-</style>
+                    <FormGroup>
+                        <TextInput
+                            invalid={errors['username']}
+                            invalidText={errors['username'] ? errors['username'] : ''}
+                            labelText="Username"
+                            type="text"
+                            name="username"
+                            id="username"
+                            class="py-3"
+                            on:input={(e) => username = e.target.value}
+                            placeholder="user@trakkie.id" />
+                    </FormGroup>
+                    <FormGroup>
+                        <PasswordInput
+                            invalid={errors['password']}
+                            invalidText={errors['password'] ? errors['password'] : ''}
+                            labelText="Password"
+                            type="password"
+                            name="password"
+                            id="password"
+                            class="py-3"
+                            on:input={(e) => password = e.target.value}
+                            placeholder="Password" />
+                    </FormGroup>
+                    
+                    <Row>
+                        <Column>
+                            <ButtonSet>
+                                <Button style="width:50%; max-width: 50%" icon={ArrowRight32} kind="secondary" on:click={handleGithub}>Github</Button>
+                                <Button style="width:50%; max-width: 50%" icon={ArrowRight32} on:click={handleSubmit}>Sign In</Button>
+                            </ButtonSet>
+                        </Column>
+                    </Row>
+                </FluidForm>
+            </Column>
+        </Row>
+    </Content>
+</div>

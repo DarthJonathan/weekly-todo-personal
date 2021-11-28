@@ -2,12 +2,15 @@
 	import { Router, Route, Link } from "svelte-navigator";
 	import Login from "./pages/Login.svelte";
 	import Register from "./pages/Register.svelte";
+	import Redirect from "./pages/Redirect.svelte";
 	import PrivateLayout from "./layout/PrivateLayout.svelte";
-    import { userStore } from "./store/user";
 	import Todo from "./pages/Todo.svelte";
+    import supabase from './util/supabase-util';
 
 	function handleLogout() {
-		$userStore = null;
+		supabase.auth.signOut().then(() => {
+			window.location.href = "/login";
+		});
   	}
 </script>
 
@@ -29,6 +32,10 @@
 			<Route path="register">
 				<Register />
 			</Route>
+
+			<Route path="redirect">
+				<Redirect />
+			</Route>
 		
 			<PrivateLayout path="/" let:location>
 				<Todo />
@@ -43,11 +50,12 @@
 
 <style>
 	main {
-		min-height: 100vh;
 		text-align: left;
 		padding: 0;
 		max-width: 240px;
 		margin: 0 auto;
+		overflow-y: hidden;
+		height: 100%;
 	}
 
 	h1 {
