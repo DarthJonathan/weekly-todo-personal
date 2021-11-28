@@ -3,7 +3,16 @@ FROM node:14-alpine as build
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json ./
-RUN apk add --no-cache --virtual .gyp python make g++
+RUN apk --no-cache add --virtual --update \
+    python3 \
+    bash \
+    lcms2-dev \
+    libpng-dev \
+    gcc \
+    g++ \
+    make \
+    autoconf \
+    automake
 RUN npm install yarn
 RUN yarn install
 COPY . ./
