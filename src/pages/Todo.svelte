@@ -234,7 +234,13 @@
         <br />
         <Row style="height: 100%;">
             {#each Array(5) as _, row}
-                <Column classname="day" style="overflow-y: hidden; height: 100%; padding-bottom: 1em;">
+                <Column 
+                    sm={12}
+                    md={4}
+                    max={3}
+                    classname="day" 
+                    style="overflow-y: scroll; min-height: 100%; padding-bottom: 1em;"
+                >
                     <div class="mb-3" style="text-align:center">
                         <h3>
                             {moment().add(row, 'd').add(modifier, 'd').format('dddd')}
