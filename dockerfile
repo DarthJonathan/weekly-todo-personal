@@ -14,7 +14,7 @@ RUN apk --no-cache add --virtual --update \
     autoconf \
     automake
 RUN npm install yarn
-RUN yarn install
+RUN yarn install --network-timeout 100000
 COPY . ./
 RUN yarn run build
 

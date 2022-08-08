@@ -239,7 +239,7 @@
                     md={4}
                     max={3}
                     classname="day" 
-                    style="overflow-y: scroll; min-height: 100%; padding-bottom: 1em;"
+                    style="overflow-y: hidden; min-height: 100%; padding-bottom: 1em;"
                 >
                     <div class="mb-3" style="text-align:center">
                         <h3>

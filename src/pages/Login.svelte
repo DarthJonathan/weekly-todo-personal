@@ -103,7 +103,7 @@
                 md={6}
                 lg={5}
             > 
-                <h1>
+                <h1 style="outline: none">
                     Login
                 </h1>
                 
