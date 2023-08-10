@@ -1,0 +1,18 @@
+name: publish
+on: [push]
+jobs:
+  publish-image:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build docker image
+        run: |
+          docker build . --tag ghcr.io/darthjonathan/personal-todo:latest
+          docker push ghcr.io/darthjonathan/personal-todo:latest
